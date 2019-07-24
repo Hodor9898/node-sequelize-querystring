@@ -20,15 +20,15 @@ const deepPropSet = (obj, dotPath, key, val) => {
 
 /** @class
  *
- * @description Used to parse query strings and produce sort / filter objects 
+ * @description Used to parse query strings and produce sort / filter objects
  *  for sequelize querying
  */
-class SequelizeQueryStringParser { 
+class SequelizeQueryStringParser {
   /** @constructor
    *
    * @param {Object} sequelize - the user's `require('sequelize')`
    * @param {Object} opts  - extra options to determine behaviour
-   * @param {Boolean} opts.symbolic - whether to use symbolic Ops 
+   * @param {Boolean} opts.symbolic - whether to use symbolic Ops
    *    or (deprecated) string Ops
    */
   constructor (sequelize, opts={}) {
@@ -41,8 +41,8 @@ class SequelizeQueryStringParser {
 
   /** @method
    *
-   * @description a helper method which allows the user to get a parser with 
-   *    symbolic=true by doing: 
+   * @description a helper method which allows the user to get a parser with
+   *    symbolic=true by doing:
    *    `const sqs = require('sequelize-querystring').withSymbolicOps(sequelize)`
    *
    * @param {Object} sequelize - the user's `require('sequelize')`
@@ -51,7 +51,7 @@ class SequelizeQueryStringParser {
    * @returns an instance of `SequelizeQueryStringParser` with symbolic=true.
    */
   withSymbolicOps (sequelize, opts={}) {
-    return new SequelizeQueryStringParser(sequelize, 
+    return new SequelizeQueryStringParser(sequelize,
       Object.assign(opts, {symbolic: true}))
   }
 
@@ -59,7 +59,7 @@ class SequelizeQueryStringParser {
    *
    * @description returns a table keyed by operator strings that will appear in the
    *  GET query string (eg. 'gt'), where the values are objects with properties
-   *  'op' and 'val', where `op` is the operator symbol or string (depending on 
+   *  'op' and 'val', where `op` is the operator symbol or string (depending on
    *  `this.symbolic`) and `val` is a function transforming the right-hand-side
    *  string in the GET query expression into an object which can be inserted into
    *  the sequelize query object.
@@ -70,7 +70,7 @@ class SequelizeQueryStringParser {
   operators() {
     const identityOps = {
       valFunc: identity,
-      ops: ['gt', 'gte', 'lt', 'lte', 'ne', 'eq', 'not', 'like', 
+      ops: ['gt', 'gte', 'lt', 'lte', 'ne', 'eq', 'not', 'like',
       'notLike', 'iLike', 'notILike']
     }
     const arrayHaveOps = {
@@ -81,7 +81,7 @@ class SequelizeQueryStringParser {
     for (var opSet of [identityOps, arrayHaveOps]) {
       for (var op of opSet.ops) {
         resultMap[op] = {
-          'op': (this.symbolic ? this.sequelize.Op[op] : `$${op}`), 
+          'op': (this.symbolic ? this.sequelize.Op[op] : `$${op}`),
           'valFunc': opSet.valFunc
         }
       }
@@ -90,18 +90,18 @@ class SequelizeQueryStringParser {
   }
 
   /** @method
-   * 
-   * Converts a query string into a where clause object for building 
+   *
+   * Converts a query string into a where clause object for building
    *    a sequelize query
    *
-   * @param {String} expression - query string expression 
+   * @param {String} expression - query string expression
    *    (eg "geoId eq 111, properties.publicoId  eq 1231")
-   * @returns {Object} the where clause for building the corresponding 
+   * @returns {Object} the where clause for building the corresponding
    *    Sequelize query
    */
   find (expression) {
     let where = {}
-    if (expression.match(/(([\w|.]+)\s(\w+)\s([\w|\s|%|_]+),?)+/)) {
+    if (expression.match(/(([\w|.]+)\s(\w+)\s([\p{L}]+),?)+/)) {
       let parts = (expression).split(',')
       const operators = this.operators()
       for (let i = 0; i < parts.length; i++) {
@@ -138,7 +138,7 @@ class SequelizeQueryStringParser {
    *
    * @param {String} expression - query string expression
    *    (eg. "geoId desc")
-   * @returns {Array} the order clause for building the corresponding Sequelize 
+   * @returns {Array} the order clause for building the corresponding Sequelize
    *    query
    */
   sort (expression, sequelize) {
@@ -170,4 +170,4 @@ class SequelizeQueryStringParser {
 
 }
 
-module.exports = new SequelizeQueryStringParser()
+module.exports = SequelizeQueryStringParser
