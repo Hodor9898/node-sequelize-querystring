@@ -102,7 +102,7 @@ class SequelizeQueryStringParser {
   find (expression) {
     let where = {}
 
-    const reg = new RegExp(`(([\\w|.]+)\\s(\\w+)\\s([${utf8letters}]+),?)+`);
+    const reg = new RegExp(`(([\\w|.]+)\\s(\\w+)\\s([0-9 ${utf8letters}]+),?)+`);
 
     if (reg.test(expression)) {
       let parts = (expression).split(',')
